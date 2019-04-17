@@ -9,10 +9,11 @@ public:
 	rival_info(u8* memory_pointer);
 	~rival_info();
 
+	u8* get_name();
 
 private:
 
-
+	u8* _name;
 
 
 };
