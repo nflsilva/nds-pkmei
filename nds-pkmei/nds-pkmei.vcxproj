@@ -100,10 +100,12 @@
     <ClInclude Include="game_save_section.h" />
     <ClInclude Include="game_state.h" />
     <ClInclude Include="gen3_save.h" />
+    <ClInclude Include="hardware_manager.h" />
     <ClInclude Include="misc_data.h" />
     <ClInclude Include="pc_buffer.h" />
     <ClInclude Include="rival_info.h" />
     <ClInclude Include="team_items.h" />
+    <ClInclude Include="ticket.h" />
     <ClInclude Include="trainer_info.h" />
   </ItemGroup>
   <ItemGroup>
@@ -112,10 +114,12 @@
     <ClCompile Include="game_save_section.cpp" />
     <ClCompile Include="game_state.cpp" />
     <ClCompile Include="gen3_save.cpp" />
+    <ClCompile Include="hardware_manager.cpp" />
     <ClCompile Include="misc_data.cpp" />
     <ClCompile Include="pc_buffer.cpp" />
     <ClCompile Include="rival_info.cpp" />
     <ClCompile Include="team_items.cpp" />
+    <ClCompile Include="ticket.cpp" />
     <ClCompile Include="trainer_info.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

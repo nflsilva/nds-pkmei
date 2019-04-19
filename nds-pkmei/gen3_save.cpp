@@ -9,14 +9,7 @@ gen3_save::gen3_save() : _data(NULL), _game_save_a(NULL), _game_save_b(NULL) {
 
 	for (int bank = 0, bi = 0; bank < 2; bank++) {
 
-		SRAM[0x5555] = 0xAA;
-		swiDelay(10);
-		SRAM[0x2AAA] = 0x55;
-		swiDelay(10);
-		SRAM[0x5555] = 0xB0;
-		swiDelay(10);
-		*SRAM = (u8)bank;
-		swiDelay(10);
+		hardware_manager::change_sram_bank(bank);
 
 		for (int ri = 0; ri < (GEN3_SAVE_FILE_BYTES / 2); ri++, bi++) {
 			sysSetBusOwners(true, true);
@@ -47,50 +40,56 @@ game_save* gen3_save::get_game_save_b() {
 }
 
 
+bool gen3_save::inject_wondercard(u8* wondercard) {
+
+	// Find the latest game save
+	game_save* current_game = get_game_save_a();
+	if (current_game->get_trainer_info()->get_index() < get_game_save_b()->get_trainer_info()->get_index()) {
+		current_game = get_game_save_b();
+	}
+	iprintf("Found out that %d is the current save.\n", current_game->get_trainer_info()->get_index());
+
+	// Find the game code
+	u32 wc_offset = E_WC_OFFSET;
+	u32 wc_script_offset = E_WC_SCRIPT_OFFSET;
+
+	trainer_info* current_info = current_game->get_trainer_info();
+	if (current_info->get_game_code() == RS_GAME_CODE) {
+		// Ruby/Sapphire does not support Wondercards
+		iprintf("Found it's a RS game.\n");
+		return false;
+	}
+	else if (current_info->get_game_code() == FRLG_GAME_CODE) {
+		wc_offset = FRLG_WC_OFFSET;
+		wc_script_offset = FRLG_WC_SCRIPT_OFFSET;
+		iprintf("Found out that it's FRLG\n");
+	}
+	rival_info* ri = current_game->get_rival_info();
+
+	// Checksum + WC
+	ri->set_data_block(wondercard, 0x4 + 0x14C, wc_offset);
+	// Icon
+	ri->set_data_block(&wondercard[0x4 + 0x14C + 0xA], 0x2, wc_offset + 0x4 + 0x14C + 0xA);
+	// Data
+	ri->set_data_block(&wondercard[0x4 + 0x14C + 0x28 + 0x28], 1004, wc_script_offset);
+
+	// Update Checksumn
+	ri->set_checksum(ri->compute_checksum());
+
+	return true;
+}
+
 bool gen3_save::write_save_to_cartridge() {
 
-	// Erase all data
-	SRAM[0x5555] = 0xAA;
-	swiDelay(10);
-	SRAM[0x2AAA] = 0x55;
-	swiDelay(10);
-	SRAM[0x5555] = 0x80;
-	swiDelay(10);
-	SRAM[0x5555] = 0xAA;
-	swiDelay(10);
-	SRAM[0x2AAA] = 0x55;
-	swiDelay(10);
-	SRAM[0x5555] = 0x10;
-	swiDelay(10);
-	while (*SRAM != 0xFF) { swiDelay(10); }
+	hardware_manager::erase_sram();
 
 	// Write all data in both banks
 	for (int bank = 0, bi = 0; bank < 2; bank++) {
 
-		SRAM[0x5555] = 0xAA;
-		swiDelay(10);
-		SRAM[0x2AAA] = 0x55;
-		swiDelay(10);
-		SRAM[0x5555] = 0xB0;
-		swiDelay(10);
-		*SRAM = (u8)bank;
-		swiDelay(10);
+		hardware_manager::change_sram_bank(bank);
 
-		sysSetBusOwners(true, true);
-		for (int ri = 0; ri < (GEN3_SAVE_FILE_BYTES / 2); ri++, bi++) {
-
-			SRAM[0x5555] = 0xAA;
-			swiDelay(10);
-			SRAM[0x2AAA] = 0x55;
-			swiDelay(10);
-			SRAM[0x5555] = 0xA0;
-			swiDelay(10);
-
-			SRAM[ri] = _data[bi];
-			swiDelay(10);
-
-			while (SRAM[ri] != _data[bi]) { swiDelay(10); }
-
+		for (uint32 ri = 0; ri < (GEN3_SAVE_FILE_BYTES / 2); ri++, bi++) {
+			hardware_manager::write_sram_byte(_data[bi], ri);
 		}
 
 	}
