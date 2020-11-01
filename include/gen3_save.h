@@ -3,7 +3,7 @@
 #include <math.h>
 #include "app.h"
 #include "game_save.h"
-#include "hardware_manager.h"
+#include "slot2_cartridge.h"
 
 
 // 128KByte size

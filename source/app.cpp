@@ -1,9 +1,11 @@
 #include "app.h"
+
+#include "video_manager.h"
+
 #include "gen3_save.h"
 #include "ticket.h"
 
-static PrintConsole topScreen;
-static PrintConsole bottomScreen;
+
 
 
 char hexToChar(u8 hex) {
@@ -17,31 +19,31 @@ char hexToChar(u8 hex) {
 }
 
 
+
+
+
 int main() {
 
-	// Initialize consoles
-	videoSetMode(MODE_0_2D);
-	videoSetModeSub(MODE_0_2D);
 
-	vramSetBankA(VRAM_A_MAIN_BG);
-	vramSetBankC(VRAM_C_SUB_BG);
-
-	consoleInit(&topScreen, 3, BgType_Text4bpp, BgSize_T_256x256, 31, 0, true, true);
-	consoleInit(&bottomScreen, 3, BgType_Text4bpp, BgSize_T_256x256, 31, 0, false, true);
-
+	video_manager& vm = vm.getInstance();
+	
+	
+	iprintf("Setup video manager\n");
+    vm.init();
+	
+	iprintf("Rendering bottom background\n");
+	vm.display_bottom_background();
+	
 	// Enable accessing slot 2:
-	sysSetCartOwner(true);
+	//sysSetCartOwner(true);
 
 
-
-
+	iprintf("Entering loop\n");
 	while (true) {
 		
+		
 		swiWaitForVBlank();
-
-
-
-
+		vm.update_oam();
 	}
 
 	return 0;

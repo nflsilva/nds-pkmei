@@ -4,7 +4,7 @@
 
 
 
-class hardware_manager {
+class slot2_cartridge {
 
 public:
 

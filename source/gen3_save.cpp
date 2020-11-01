@@ -9,7 +9,7 @@ gen3_save::gen3_save() : _data(NULL), _game_save_a(NULL), _game_save_b(NULL) {
 
 	for (int bank = 0, bi = 0; bank < 2; bank++) {
 
-		hardware_manager::change_sram_bank(bank);
+		slot2_cartridge::change_sram_bank(bank);
 
 		for (int ri = 0; ri < (GEN3_SAVE_FILE_BYTES / 2); ri++, bi++) {
 			sysSetBusOwners(true, true);
@@ -46,7 +46,7 @@ bool gen3_save::inject_wondercard(u8* wondercard) {
 	if (current_game->get_trainer_info()->get_index() < get_game_save_b()->get_trainer_info()->get_index()) {
 		current_game = get_game_save_b();
 	}
-	iprintf("Found out that %d is the current save.\n", current_game->get_trainer_info()->get_index());
+	iprintf("Found out that %lu is the current save.\n", current_game->get_trainer_info()->get_index());
 
 	// Find the game code
 	u32 wc_offset = E_WC_OFFSET;
@@ -80,15 +80,15 @@ bool gen3_save::inject_wondercard(u8* wondercard) {
 
 bool gen3_save::write_save_to_cartridge() {
 
-	hardware_manager::erase_sram();
+	slot2_cartridge::erase_sram();
 
 	// Write all data in both banks
 	for (int bank = 0, bi = 0; bank < 2; bank++) {
 
-		hardware_manager::change_sram_bank(bank);
+		slot2_cartridge::change_sram_bank(bank);
 
 		for (uint32 ri = 0; ri < (GEN3_SAVE_FILE_BYTES / 2); ri++, bi++) {
-			hardware_manager::write_sram_byte(_data[bi], ri);
+			slot2_cartridge::write_sram_byte(_data[bi], ri);
 		}
 
 	}

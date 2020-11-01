@@ -1,8 +1,8 @@
-#include "hardware_manager.h"
+#include "slot2_cartridge.h"
 
 
 
-bool hardware_manager::change_sram_bank(u8 bank) {
+bool slot2_cartridge::change_sram_bank(u8 bank) {
 
 	SRAM[0x5555] = 0xAA;
 	swiDelay(10);
@@ -16,7 +16,7 @@ bool hardware_manager::change_sram_bank(u8 bank) {
 	return true;
 }
 
-bool hardware_manager::erase_sram() {
+bool slot2_cartridge::erase_sram() {
 
 	// Erase all data
 	SRAM[0x5555] = 0xAA;
@@ -36,7 +36,7 @@ bool hardware_manager::erase_sram() {
 	return true;
 }
 
-bool hardware_manager::write_sram_byte(u8 byte, u32 offset) {
+bool slot2_cartridge::write_sram_byte(u8 byte, u32 offset) {
 
 	sysSetBusOwners(true, true);
 
