@@ -14,4 +14,5 @@ A Nintendo DS program, capable of manipulating and inject event in third generat
 - [Save Game Flash Read/Write](https://github.com/xerpi/desmume-vita/blob/master/desmume/src/addons/slot2_gbagame.cpp)
 - [Save Game Flash Read/Write Examples](https://github.com/AdmiralCurtiss/nds-savegame-manager)
 - [Pokemon Event Data and Injector](https://github.com/suloku/wc-tool)
+- [Pokemon Event Injector Thread](https://digiex.net/threads/pokemon-gen-3-mystery-gift-tool-download-inject-nintendo-events-wondercards-more.14863/)
 

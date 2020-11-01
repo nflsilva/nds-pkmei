@@ -329,9 +329,13 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 
-.elf
-.nds
-.o
-.d
-.map
+# Files from nds project
+*.elf
+*.nds
+*.o
+*.d
+*.map
+*.project
+*.arm9
+build/
 
