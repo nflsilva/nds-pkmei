@@ -1,7 +1,5 @@
 #include "app.h"
 
-#include "video_manager.h"
-
 #include "gen3_save.h"
 #include "ticket.h"
 
@@ -20,30 +18,124 @@ char hexToChar(u8 hex) {
 
 
 
+void init_bottom_sprites(){
+	
+	NF_InitSpriteSys(1);
+	
+	NF_LoadSpriteGfx("sprite/auroraTicket", 0, 16, 16);
+	NF_LoadSpritePal("sprite/auroraTicket", 0);
+	
+	NF_LoadSpriteGfx("sprite/eonTicket", 1, 16, 16);
+	NF_LoadSpritePal("sprite/eonTicket", 1);
+	
+	NF_LoadSpriteGfx("sprite/mysticTicket", 2, 16, 16);
+	NF_LoadSpritePal("sprite/mysticTicket", 2);
+	
+	NF_LoadSpriteGfx("sprite/oldSeaMap", 3, 16, 16);
+	NF_LoadSpritePal("sprite/oldSeaMap", 3);
+	
+	NF_VramSpriteGfx(1, 0, 0, true);
+	NF_VramSpritePal(1, 0, 0);
+	
+	NF_VramSpriteGfx(1, 1, 1, true);
+	NF_VramSpritePal(1, 1, 1);
+	
+	NF_VramSpriteGfx(1, 2, 2, true);
+	NF_VramSpritePal(1, 2, 2);
+	
+	NF_VramSpriteGfx(1, 3, 3, true);
+	NF_VramSpritePal(1, 3, 3);
+	
+}
+void draw_bottom_sprites(){
+	NF_CreateSprite(1, 0, 0, 0, 26, 26);
+	NF_CreateSprite(1, 1, 1, 1, 146, 26);
+	NF_CreateSprite(1, 2, 2, 2, 26, 113);
+	NF_CreateSprite(1, 3, 3, 3, 146, 113);
+}
+void cleanup_bottom_sprite_ram(){
+	
+	NF_UnloadSpriteGfx(0);
+	NF_UnloadSpritePal(0);
+	
+	NF_UnloadSpriteGfx(1);
+	NF_UnloadSpritePal(1);
+	
+	NF_UnloadSpriteGfx(2);
+	NF_UnloadSpritePal(2);
+	
+	NF_UnloadSpriteGfx(3);
+	NF_UnloadSpritePal(3);
+	
+}
+
+
 
 
 int main() {
 
 
-	video_manager& vm = vm.getInstance();
+	
+	// Init section. Only consoles 
+	NF_Set2D(0, 0);
+	NF_Set2D(1, 0);
+	consoleDemoInit();
+	
+	iprintf("nds-pkmei 0.1\n");
+	iprintf("NitroFS init.");
+	
+	swiWaitForVBlank();
+	NF_SetRootFolder("NITROFS");
 	
 	
-	iprintf("Setup video manager\n");
-    vm.init();
+	// Post-Init section
+	NF_Set2D(0, 0);
+	NF_Set2D(1, 0);
+
+	NF_InitTiledBgBuffers();
+	NF_InitTiledBgSys(1);
+	NF_InitTextSys(1);
 	
-	iprintf("Rendering bottom background\n");
-	vm.display_bottom_background();
+	// Init backgrounds (layer 3)
+	NF_LoadTiledBg("bg/bottomBackground", "bbg", 256, 256);
+	NF_CreateTiledBg(1, 3, "bbg");
+
+	// Init sprites
+	NF_InitSpriteBuffers();
+	init_bottom_sprites();
+	draw_bottom_sprites();
+	cleanup_bottom_sprite_ram();
 	
-	// Enable accessing slot 2:
+	// Init texts (layer 1)
+	NF_LoadTextFont16("fnt/font16", "bottom", 256, 256, 0);
+	NF_CreateTextLayer16(1, 1, 0, "bottom");
+	
+	NF_DefineTextColor(1, 1, 0, 31, 31, 31);
+	
+	NF_SetTextColor(1, 1, 0);
+	NF_WriteText16(1, 1, 2, 4, "Aurora Ticket");
+	NF_WriteText16(1, 1, 19, 4, "Eon Ticket");
+	NF_WriteText16(1, 1, 2, 9, "Mystic Ticket");
+	NF_WriteText16(1, 1, 18, 9, "Old Sea Map");
+
+	NF_UpdateTextLayers();
+	//Enable accessing slot 2:
 	//sysSetCartOwner(true);
 
 
 	iprintf("Entering loop\n");
 	while (true) {
 		
-		
-		swiWaitForVBlank();
-		vm.update_oam();
+	
+		NF_SpriteOamSet(0);
+		NF_SpriteOamSet(1);
+
+		NF_UpdateTextLayers();
+
+		swiWaitForVBlank();	
+
+		oamUpdate(&oamMain);
+		oamUpdate(&oamSub);
 	}
 
 	return 0;
